@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
+
+// Pass properties down from one class with props
+
 class Square extends React.Component {
     // Adding state to the button
     constructor(props){
@@ -11,7 +14,9 @@ class Square extends React.Component {
 
     render() {
       return (
-        <button className="square" onClick={() => {(this.state.value == null) ? this.setState({value: 'X'}) : this.setState({value: null})}}>{this.state.value}</button>
+        <button 
+            className="square"
+            onClick={() => {(this.state.value == null) ? this.setState({value: 'X'}) : this.setState({value: null})}}>{this.state.value}</button>
       );
     }
   }
