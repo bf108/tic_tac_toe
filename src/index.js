@@ -36,19 +36,27 @@ import './index.css';
         return (this.state.xIsNext ? 'X' : 'O')
     }
 
+    checkSquareEmpty(i){
+        return this.state.squares[i] == null ? true : false
+    }
+
     // This method updates the value of the square in this.state.squares
     handleClick(i){
         // Shallow copy of the array
         const squares = this.state.squares.slice()
         // Modify the cell which has been clicked
         // squares[i] = 'X'
-        squares[i] = this.selectShape()
-        // Update the state
-        this.setState({
-            squares: squares,
-            xIsNext: !this.state.xIsNext
-        })
-
+        if (this.checkSquareEmpty(i)){
+            squares[i] = this.selectShape()
+            // Update the state
+            this.setState({
+                squares: squares,
+                xIsNext: !this.state.xIsNext
+                })
+        } else {
+            console.log('Square not clickable')
+            window.alert('Other player already selected this box')
+        }
     }
     renderSquare(i) {
       return (
