@@ -26,59 +26,19 @@ import './index.css';
     }
   
   class Board extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = {squares: Array(9).fill(null), 
-                        xIsNext: true
-                }}
-
-    selectShape(){
-        return (this.state.xIsNext ? 'X' : 'O')
-    }
-
-    checkSquareEmpty(i){
-        return this.state.squares[i] == null ? true : false
-    }
-
-    // This method updates the value of the square in this.state.squares
-    handleClick(i){
-        // Shallow copy of the array
-        const squares = this.state.squares.slice()
-        // Modify the cell which has been clicked
-        // squares[i] = 'X'
-        if (this.checkSquareEmpty(i)){
-            squares[i] = this.selectShape()
-            // Update the state
-            this.setState({
-                squares: squares,
-                xIsNext: !this.state.xIsNext
-                })
-        } else {
-            console.log('Square not clickable')
-            window.alert('Other player already selected this box')
-        }
-    }
     renderSquare(i) {
       return (
         <Square
-             value={this.state.squares[i]} 
-            onClick={() => this.handleClick(i)}
+             value={this.props.squares[i]} 
+            onClick={() => this.props.onClick(i)}
         />
        );
     }
-
-    checkWinner(){
-        const status = calculateWinner(this.state.squares)
-        return status == null ? `Next player: ${this.selectShape()}` : `Winner is ${status}`
-    }
-  
     render() {
     //   const status = `Next player: ${this.selectShape()}`;
-      const status = this.checkWinner()
   
       return (
         <div>
-          <div className="status">{status}</div>
           <div className="board-row">
             {this.renderSquare(0)}
             {this.renderSquare(1)}
@@ -100,18 +60,74 @@ import './index.css';
   }
   
   class Game extends React.Component {
+    // constructor (props){
+    //     super(props)
+    //     this.state = {
+    //         history: new Array([{
+    //             squares: Array(9).fill(null)
+    //         }]),
+    //         xIsNext: true
+    //     }
+    // }
+    constructor(props) {
+        super(props);
+        this.state = {
+          history: [{
+            squares: Array(9).fill(null)
+          }],
+          xIsNext: true
+        };
+      }
+
+    selectShape(){
+        return (this.state.xIsNext ? 'X' : 'O')
+    }
+    checkSquareEmpty(i){
+        const hist = this.state.history
+        return hist[hist.length -1].squares[i] == null ? true : false
+    }
+
+    // This method updates the value of the square in this.state.squares
+    handleClick(i){
+        // Shallow copy of the array
+        const hist = this.state.history
+        const current = hist[hist.length - 1]
+        const squares = hist[hist.length -1].squares.slice()
+        // Modify the cell which has been clicked
+        // squares[i] = 'X'
+        if (this.checkSquareEmpty(i)){
+            squares[i] = this.selectShape()
+            // Update the state
+            this.setState({
+                history: hist.concat([{squares: squares}]),
+                xIsNext: !this.state.xIsNext
+                })
+        } else {
+            console.log('Square not clickable')
+            window.alert('Other player already selected this box')
+        }
+    }
+
     render() {
-      return (
-        <div className="game">
-          <div className="game-board">
-            <Board />
-          </div>
-          <div className="game-info">
-            <div>{/* status */}</div>
-            <ol>{/* TODO */}</ol>
-          </div>
-        </div>
-      );
+        const hist = this.state.history
+        const current_board = hist[hist.length -1]
+        const winner = calculateWinner(current_board.squares)
+        let status = (winner == null) ? `Next player: ${this.selectShape()}` : `Winner is ${winner}`
+        
+        return (
+            <div className="game">
+                <div className="game-board">
+                    <Board 
+                        squares={current_board.squares} 
+                        onClick={(i) => this.handleClick(i)} 
+                    />
+            </div>
+            <div className="game-info">
+                <div>{status}</div>
+                <ol>{/* TODO */}</ol>
+            </div>
+            </div>
+        );
     }
   }
   
