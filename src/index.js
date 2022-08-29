@@ -8,15 +8,6 @@ import './index.css';
 
 // class Square extends React.Component {
 
-//     render() {
-//       return (
-//         <button 
-//             className="square"
-//             // Calls the onClick method from parent (Board)
-//             onClick={() => this.props.onClick()}>{this.props.value}</button>
-//       );
-//     }
-//   }
     function Square(props){
         return (
             <button className="square" onClick={props.onClick}>
@@ -75,7 +66,8 @@ import './index.css';
           history: [{
             squares: Array(9).fill(null)
           }],
-          xIsNext: true
+          xIsNext: true,
+          stepNum: 0
         };
       }
 
@@ -90,7 +82,8 @@ import './index.css';
     // This method updates the value of the square in this.state.squares
     handleClick(i){
         // Shallow copy of the array
-        const hist = this.state.history
+        // const hist = this.state.history
+        const hist = this.state.history.slice(0, this.state.stepNum + 1)
         const current = hist[hist.length - 1]
         const squares = hist[hist.length -1].squares.slice()
         // Modify the cell which has been clicked
@@ -100,7 +93,9 @@ import './index.css';
             // Update the state
             this.setState({
                 history: hist.concat([{squares: squares}]),
-                xIsNext: !this.state.xIsNext
+                xIsNext: !this.state.xIsNext,
+                stepNum: this.state.history.length
+
                 })
         } else {
             console.log('Square not clickable')
@@ -108,11 +103,30 @@ import './index.css';
         }
     }
 
+    moveTo(step){
+        this.setState({
+            stepNum: step,
+            xIsNext: step % 2 === 0
+        })
+
+    }
+
     render() {
         const hist = this.state.history
-        const current_board = hist[hist.length -1]
+        // const current_board = hist[hist.length -1]
+        const current_board = hist[this.state.stepNum]
         const winner = calculateWinner(current_board.squares)
         let status = (winner == null) ? `Next player: ${this.selectShape()}` : `Winner is ${winner}`
+        let goNumber = this.state.stepNum
+
+        // Track moves to display
+        const moves = hist.map((move, step) => {
+            const goToDesc = step ? `Go to move: ${step}` : `Go back to start`
+            // Always very important to assign a unique key to a dynamically created components
+            return <li key={step}>
+                <button onClick={() => this.moveTo(step)}>{goToDesc}</button>
+            </li>
+        })
         
         return (
             <div className="game">
@@ -124,7 +138,8 @@ import './index.css';
             </div>
             <div className="game-info">
                 <div>{status}</div>
-                <ol>{/* TODO */}</ol>
+                <div>{`This is go number: ${goNumber}`}</div>
+                <ol>{moves}</ol>
             </div>
             </div>
         );
